@@ -1,2 +1,2 @@
 # PCM_FLUX.jl
-Exercise in FLUX.jl
+Exercises in FLUX.jl
