@@ -22,7 +22,7 @@ md"
 ====================================================================================
 #### FLUX, [Fitting A Straight Line](https://fluxml.ai/Flux.jl/stable/guide/models/overview/)
 ##### file: PCM20260922\_FLUX\_Fitting\_A\_Straight\_Line
-##### Julia/Pluto.jl: 1.13.0/1.0.3 by PCM *** 2026/09/23 ***
+##### Julia/Pluto.jl: 1.13.0/1.0.3 by PCM *** 2026/10/11 ***
 
 ====================================================================================
 "
@@ -59,7 +59,10 @@ md"
 
 # ╔═╡ c701aed8-df49-41e2-847c-18cd0dacffe0
 # True (unknown) generative model used to generate data
-actual(x) = 4x + 2
+trueModel(x) = 4x + 2
+
+# ╔═╡ c2e2d968-52f9-4fd9-bdf9-06934489dc94
+trueModel
 
 # ╔═╡ 7279d56f-7077-492d-9764-a163352b7806
 md"
@@ -72,14 +75,14 @@ Use the actual function to build sets of data for training and verification:
 x_train, x_test = hcat(0:5...), hcat(6:10...)
 
 # ╔═╡ 211fa24f-3bd0-47d3-9e21-a57ff8a51634
-y_train, y_test = actual.(x_train), actual.(x_test)
+y_train, y_test = trueModel.(x_train), trueModel.(x_test)
 
 # ╔═╡ 6dfe3060-9104-4f4b-acd1-5c213d89db69
 let xs = [x for x in 6.0:0.1:10.0]
 	plot(title=L"train\ and\ test\ data", size=(800, 600))
 	scatter!(x_train, y_train, label=L"train\ data", color=:green)
 	scatter!(x_test, y_test, label=L"test\ data", color=:red)
-	plot!(xs, x -> actual(x), label=L"model", color=:red, lw=2, ls=:dash)
+	plot!(xs, trueModel.(xs), label=L"trueModel", color=:red, lw=2, ls=:dash)
 end # let
 
 # ╔═╡ eacb99c7-7480-4f43-8e22-d73b96d3202f
@@ -97,21 +100,30 @@ Dense(1 => 1)
 # ╔═╡ 1d732535-ee3e-455c-bfe6-c9afb381e842
 typeof(Dense(1 => 1))
 
+# ╔═╡ 293be91a-f6e3-4c85-89d8-98c8385a3409
+fieldnames(Dense)
+
+# ╔═╡ 368ccfa4-374d-4866-9c99-3e791e01a845
+propertynames(Dense)
+
 # ╔═╡ e3ba2b07-4636-43b7-b5f2-f19c6138c1ba
-myModel = 
+neuralModel = 
 	Dense(1 => 1)
 
 # ╔═╡ 4c7e1956-c485-4ff8-9bb9-910e507c83f2
-myModel.weight, myModel.bias
+neuralModel.weight, neuralModel.bias, neuralModel.σ
 
 # ╔═╡ b743a888-fb79-4b1b-8e7d-98577771a145
 # There's another way to think about a model. In Flux, models are conceptually predictive functions: 
 predictiveF = 
 	Dense(1 => 1)
 
-# ╔═╡ 22e29827-a791-4b34-a847-551a83b581b9
+# ╔═╡ 292a487c-10e9-47eb-b14d-7b7d3cace934
+typeof(predictiveF)
+
+# ╔═╡ 34d481bb-1ed5-4820-a70c-2d4a2c7d449e
 # initial parameters
-predictiveF.weight, predictiveF.bias
+predictiveF.weight, predictiveF.bias, predictiveF.σ
 
 # ╔═╡ 9126fb7a-b99b-4690-8fec-483328133af4
 # This model will already make predictions, though not accurate ones yet:
@@ -240,7 +252,7 @@ Plots = "~1.41.7"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.13.0"
+julia_version = "1.13.1"
 manifest_format = "2.1"
 project_hash = "4643fa3258fcf648e8d0cd4056f04ea1f41d9e09"
 
@@ -922,7 +934,7 @@ version = "1.9.1+0"
 [[deps.LibSSH2_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl", "OpenSSL_jll", "Zlib_jll"]
 uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
-version = "1.11.103+0"
+version = "1.11.104+0"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -2009,6 +2021,7 @@ uuid = "23338594-aafe-5451-b93e-139f81909106"
 # ╠═a294a2cd-2f91-41a5-aff6-56a757652f2c
 # ╟─3ba503a4-bf39-49b4-98a7-2dadeb11b26d
 # ╠═c701aed8-df49-41e2-847c-18cd0dacffe0
+# ╠═c2e2d968-52f9-4fd9-bdf9-06934489dc94
 # ╟─7279d56f-7077-492d-9764-a163352b7806
 # ╠═0cddbdf5-bfd2-4499-a8ea-502b330267f9
 # ╠═211fa24f-3bd0-47d3-9e21-a57ff8a51634
@@ -2016,10 +2029,13 @@ uuid = "23338594-aafe-5451-b93e-139f81909106"
 # ╟─eacb99c7-7480-4f43-8e22-d73b96d3202f
 # ╠═2a6bcf91-504c-443d-b450-a2d82567d90a
 # ╠═1d732535-ee3e-455c-bfe6-c9afb381e842
+# ╠═293be91a-f6e3-4c85-89d8-98c8385a3409
+# ╠═368ccfa4-374d-4866-9c99-3e791e01a845
 # ╠═e3ba2b07-4636-43b7-b5f2-f19c6138c1ba
 # ╠═4c7e1956-c485-4ff8-9bb9-910e507c83f2
 # ╠═b743a888-fb79-4b1b-8e7d-98577771a145
-# ╠═22e29827-a791-4b34-a847-551a83b581b9
+# ╠═292a487c-10e9-47eb-b14d-7b7d3cace934
+# ╠═34d481bb-1ed5-4820-a70c-2d4a2c7d449e
 # ╠═9126fb7a-b99b-4690-8fec-483328133af4
 # ╟─05e1cc99-4e9d-4351-a5b8-af8476444282
 # ╠═61de0532-230e-4ff9-864b-3d39d232402a
